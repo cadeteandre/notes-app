@@ -36,10 +36,10 @@ const styles = StyleSheet.create({
     borderRadius:10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#343a40",
-    textAlign: "center",
+    marginBottom: 10,
+    color: "#333",
   },
   subtitle: {
     fontSize: 16,
@@ -56,6 +56,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    textAlign: "center",
+  },
+  centeredContainer: {
+    alignItems: "center",
+    justifyContent: "center",
     textAlign: "center",
   },
 });
