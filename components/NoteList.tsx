@@ -6,7 +6,7 @@ const NoteList = ({ notes }: { notes: any[] }) => {
         <View>
             <FlatList
                 data={notes}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <NoteItem note={item} />
                 )}
