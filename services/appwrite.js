@@ -10,6 +10,8 @@ const config = {
     }
 };
 
+console.log('Appwrite config:', config);
+
 const client = new Client()
     .setEndpoint(config.endpoint)
     .setProject(config.projectId);

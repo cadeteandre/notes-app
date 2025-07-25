@@ -10,6 +10,31 @@ const databaseService = {
             console.log('Error fetching documents', error);
             return { error: error.message };
         }
+    },
+    //Create Document
+    async createDocument(dbId, colId, data, id = null) {
+        try {
+            return await database.createDocument(dbId, colId, id || undefined, data);
+        } catch(error) {
+            console.error('Error creating document', error);
+            return {
+                error: error.message,
+            }
+        }
+    },
+    //Delete Document
+    async deleteDocument(dbId, colId, id) {
+        console.log('deleteDocument called with:', { dbId, colId, id });
+        try{
+            const result = await database.deleteDocument(dbId, colId, id);
+            console.log('deleteDocument success:', result);
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting document', error);
+            return {
+                error: error.message,
+            }
+        }
     }
 }
 

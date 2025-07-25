@@ -2,7 +2,7 @@ import AddNoteModal from "@/components/AddNoteModal";
 import NoteList from "@/components/NoteList";
 import noteService from "@/services/noteService";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const NotesScreen = () => {
 
@@ -31,16 +31,72 @@ const NotesScreen = () => {
         setIsLoading(false);
     };
 
-    const addNote = () => {
-        // TODO: Implement add note functionality
+    const addNote = async() => {
+        if(newNote.trim() === '') return;
+
+        const response = await noteService.addNote(newNote);
+
+        if(response.error) {
+            Alert.alert('Error', response.error);
+        } else {
+            setNotes((prevNotes) => [...prevNotes, response.data]);
+        }
+
         setNewNote('');
         setIsModalVisible(false);
     };
 
+    const deleteNote = async(id: string) => {
+        console.log('deleteNote called with id:', id);
+        
+        // Para web, deletar diretamente. Para mobile, mostrar confirmação
+        if (Platform.OS === 'web') {
+            // Confirmar com prompt nativo do browser
+            if (confirm('Are you sure you want to delete this note?')) {
+                await performDelete(id);
+            }
+        } else {
+            // Usar Alert.alert para mobile
+            Alert.alert('Delete Note', 'Are you sure you want to delete this note?', [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: () => performDelete(id),
+                },
+            ]);
+        }
+    };
+
+    const performDelete = async (id: string) => {
+        console.log('Delete button pressed, calling noteService.deleteNote');
+        const response = await noteService.deleteNote(id);
+        console.log('deleteNote response:', response);
+        if(response.error) {
+            if (Platform.OS === 'web') {
+                alert('Error: ' + response.error);
+            } else {
+                Alert.alert('Error', response.error);
+            }
+        } else {
+            console.log('Note deleted successfully, updating state');
+            setNotes((prevNotes) => prevNotes.filter((note) => note.$id !== id));
+        }
+    };
+
     return ( 
         <View style={styles.container}> 
-            <Text>Notes</Text>
-            <NoteList notes={notes} />
+            { isLoading ? (
+                <ActivityIndicator size='large' color='#007bff' />
+            ) : (
+                <>
+                { error ? <Text style={styles.errorText}>{error}</Text> : null }
+                <NoteList notes={notes} onDelete={deleteNote} />
+                </>
+            )}
             <TouchableOpacity style={styles.addNoteButton} onPress={() => setIsModalVisible(true)}>
                 <Text style={styles.addNoteButtonText}>+ Add Note</Text>
             </TouchableOpacity>
@@ -56,6 +112,8 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: "#fff",
+        minHeight: "100%",
+        justifyContent: "space-between",
     },
     addNoteButton: {
         backgroundColor: "#ff8c00",
@@ -69,6 +127,12 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center",
     },
+    errorText: {
+        color: "red",
+        textAlign: "center",
+        marginBottom: 10,
+        fontSize: 16,
+    }
 });
 
 export default NotesScreen;
