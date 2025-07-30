@@ -87,6 +87,20 @@ const NotesScreen = () => {
         }
     };
 
+    const editNote = async (id: string, newText: string) => {
+        if(!newText.trim()) {
+            Alert.alert('Error', 'Note cannot be empty');
+            return;
+        }
+
+        const response: any = await noteService.updateNote(id, newText);
+        if(response.error) {
+            Alert.alert('Error', response.error);
+        } else {
+            setNotes((prevNotes) => prevNotes.map((note) => note.$id === id ? { ...note, text: response.data?.text } : note));
+        }
+    }
+
     return ( 
         <View style={styles.container}> 
             { isLoading ? (
@@ -94,7 +108,7 @@ const NotesScreen = () => {
             ) : (
                 <>
                 { error ? <Text style={styles.errorText}>{error}</Text> : null }
-                <NoteList notes={notes} onDelete={deleteNote} />
+                <NoteList notes={notes} onDelete={deleteNote} onEdit={editNote} />
                 </>
             )}
             <TouchableOpacity style={styles.addNoteButton} onPress={() => setIsModalVisible(true)}>
