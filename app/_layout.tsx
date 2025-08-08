@@ -1,11 +1,13 @@
+import { AuthProvider } from '@/contexts/AuthContext';
 import { Stack } from "expo-router";
 import { Text, TouchableOpacity } from "react-native";
 
 export default function RootLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: "#ff8c00" },
+    <AuthProvider>
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: "#ff8c00" },
         headerTintColor: "#fff",
         headerTitleStyle: {
           fontSize: 20,
@@ -41,5 +43,6 @@ export default function RootLayout() {
         })} 
       />
     </Stack>
+    </AuthProvider>
   );
 }
