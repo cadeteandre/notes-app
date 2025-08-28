@@ -23,6 +23,10 @@ switch (Platform.OS) {
     case 'android':
         client.setPlatform(process.env.EXPO_PUBLIC_APPWRITE_PACKAGE_NAME);
         break;
+    case 'web':
+        // Para web, usar o hostname da aplicação
+        client.setPlatform('localhost');
+        break;
 }
 
 const database = new Databases(client);

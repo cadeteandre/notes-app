@@ -1,16 +1,64 @@
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 const AuthScreen = () => {
 
+    const { login, register } = useAuth();
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isRegistering, setIsRegistering] = useState(false);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<boolean | string>(false);
 
-    const handleLogin = () => {
-        console.log('Login');
+    const handleAuth = async () => {
+        setError(false);
+        
+        if (!email.trim() || !password.trim()) {
+            setError('Please fill in all fields');
+            return;
+        }
+
+        // Validação de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+            setError('Please enter a valid email address');
+            return;
+        }
+
+        // Validação de senha para registro
+        if (isRegistering) {
+            if (password.length < 8) {
+                setError('Password must be at least 8 characters long');
+                return;
+            }
+            if (password !== confirmPassword) {
+                setError('Passwords do not match');
+                return;
+            }
+        }
+
+        let response;
+
+        try {
+            if(isRegistering) {
+              response = await register(email.trim(), password);
+            } else {
+              response = await login(email.trim(), password);
+            }
+
+            if(response?.error) {
+              setError(response.error);
+              return;
+            }
+
+            router.replace('/notes');
+        } catch (error) {
+            setError('An unexpected error occurred. Please try again.');
+            console.error('Auth error:', error);
+        }
     }
 
 
@@ -49,7 +97,7 @@ const AuthScreen = () => {
                 />
             )}
 
-            <TouchableOpacity style={styles.button} >
+            <TouchableOpacity style={styles.button} onPress={handleAuth}>
                 <Text style={styles.buttonText}>{isRegistering ? 'Sign Up' : 'Login'}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setIsRegistering(!isRegistering)}>
