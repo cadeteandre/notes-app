@@ -8,7 +8,18 @@ const authService = {
             const response = await account.create(ID.unique(), email, password);
             return response;
         } catch (error) {
-            return { error: error.message || 'Resgister failed. Please try again.' };
+            console.error('Registration error:', error);
+            let errorMessage = 'Register failed. Please try again.';
+            
+            if (error.code === 400) {
+                errorMessage = 'Invalid email or password format. Please check your input.';
+            } else if (error.code === 409) {
+                errorMessage = 'A user with this email already exists.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            return { error: errorMessage };
         }
     },
     //login a user
